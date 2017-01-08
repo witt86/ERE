@@ -67,9 +67,11 @@ export const createServer = (config) => {
         host: req.headers.host
       }
     })
-    const routes = createRoutes(store)
+    const routes = createRoutes(store);
+
     const history = createMemoryHistory(req.originalUrl)
     const { dispatch } = store
+
 
     match({ routes, history}, (err, redirectLocation, renderProps) => {
       if (err) {
@@ -80,6 +82,13 @@ export const createServer = (config) => {
       if (!renderProps) {
         return res.status(404).send('Not found')
       }
+
+      console.log("--------redirectLocation--------");
+      console.log(redirectLocation);
+
+      console.log("------renderProps------");
+      console.log(renderProps);
+
 
       const { components } = renderProps
 
