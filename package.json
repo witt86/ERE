@@ -1,6 +1,6 @@
 {
   "name": "ERE",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "Isomorphic React Starter with Redux, React Router, Redial, Aphrodite, Express, Webpack.",
   "scripts": {
     "test": "cross-env NODE_ENV=test ./node_modules/mocha/bin/mocha --compilers js:babel-core/register --recursive",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jaredpalmer/react-production-starter.git"
+    "url": "git+https://github.com/witt86/ERE.git"
   },
   "keywords": [],
   "author": "jaredpalmer",
@@ -22,7 +22,7 @@
   "bugs": {
     "url": "https://github.com/jaredpalmer/react-production-starter/issues"
   },
-  "homepage": "https://github.com/jaredpalmer/react-production-starter#readme",
+  "homepage": "https://github.com/witt86/ERE.git",
   "dependencies": {
     "aphrodite": "^1.1.0",
     "assets-webpack-plugin": "^3.3.0",
