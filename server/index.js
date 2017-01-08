@@ -23,18 +23,22 @@ import DefaultServerConfig from './config'
 import webpackConfig from '../tools/webpack.client.dev'
 import { compileDev, startDev } from '../tools/dx'
 import { configureStore } from '../common/store'
-import reducer from '../common/createReducer'
 import createRoutes from '../common/routes/root'
 
+import {EndPointMap} from "./api/lib/EndPointMap";
+import session from "express-session";
+import connectRedis from "connect-redis";
+import main from "./api/main"
+
 export const createServer = (config) => {
-  const __PROD__ = config.nodeEnv === 'production'
-  const __TEST__ = config.nodeEnv === 'test'
+  const __PROD__ = config.NODE_ENV === 'production'
+  const __TEST__ = config.NODE_ENV === 'test'
 
   const app = express()
   let assets = null
   app.disable('x-powered-by')
   app.use(bodyParser.json())
-  app.use(bodyParser.urlencoded({ extended: true }))
+  app.use(bodyParser.urlencoded({ extended: false }))
 
   if (__PROD__ || __TEST__) {
     app.use(morgan('combined'))
@@ -57,7 +61,23 @@ export const createServer = (config) => {
   }
 
   app.use(express.static('public'))
-  app.use('/api/v0/posts', require('./api/posts'))
+
+  const RedisStore = connectRedis(session);
+  const sessionCookieKey = "app-" + (process.env.NODE_ENV||"production");
+  app.use(session({
+    store: new RedisStore({
+      host: "127.0.0.1",
+      port: 6379
+    }),
+    secret: "kdjcy23Yhne24*763",
+    key: sessionCookieKey,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {maxAge: 8000 * 1000}
+  }));
+
+  // API相关路由,在main内部映射到各个功能Model
+  app.use("/api",main);
 
 
   app.get('*', (req, res) => {
@@ -83,22 +103,19 @@ export const createServer = (config) => {
         return res.status(404).send('Not found')
       }
 
-      console.log("--------redirectLocation--------");
-      console.log(redirectLocation);
-
-      console.log("------renderProps------");
-      console.log(renderProps);
-
 
       const { components } = renderProps
+
+      let params_etr = req.session ? {
+         session:req.session,
+         invokeEnterance: EndPointMap
+      } : {};
 
       // Define locals to be provided to all lifecycle hooks:
       const locals = {
         path: renderProps.location.pathname,
         query: renderProps.location.query,
-        params: renderProps.params,
-
-        // Allow lifecycle hooks to dispatch Redux actions:
+        params: Object.assign(renderProps.params,params_etr),
         dispatch
       }
 
@@ -176,7 +193,6 @@ export const createServer = (config) => {
     })
   })
 
-
   const server = http.createServer(app)
 
 
@@ -202,12 +218,11 @@ export const createServer = (config) => {
   return server
 }
 
-
 export const startServer = (serverConfig) => {
   const config =  {...DefaultServerConfig, ...serverConfig}
   const server = createServer(config)
   server.listen(config.port, (err) => {
-    if (config.nodeEnv === 'production' || config.nodeEnv === 'test') {
+    if (config.NODE_ENV === 'production' || config.NODE_ENV === 'test') {
       if (err) console.log(err)
       console.log(`server ${config.id} listening on port ${config.port}`)
     } else {

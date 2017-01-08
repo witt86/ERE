@@ -7,7 +7,6 @@ import data from '../data'
 // and maintain DRY
 const Home = (props) => (
   <div>
-
     <h2 className={css(styles.header)}>About</h2>
     <p className={css(styles.lead)}>
       This is an example react application (master-detail feed) with isomorphic rendering, async react-router routes, async redux reducers, async data fetching, and code-splitting.
