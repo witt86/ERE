@@ -1,2 +1,1 @@
-# ERE:基于NODEJS的全栈开发框架
-
+# ERE:基于NODEJS的全栈开发脚手架
